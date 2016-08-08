@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(footstep_planner)
 
-find_package(catkin REQUIRED COMPONENTS actionlib angles gridmap_2d humanoid_nav_msgs map_server roscpp rospy tf visualization_msgs)
+find_package(catkin REQUIRED COMPONENTS actionlib angles gridmap_2d humanoid_nav_msgs map_server message_generation roscpp rospy tf visualization_msgs)
 
 find_package(OpenCV REQUIRED)
 
@@ -10,6 +10,14 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(SBPL REQUIRED sbpl)
 include_directories(${SBPL_INCLUDE_DIRS})
 link_directories(${SBPL_LIBRARY_DIRS})
+
+add_message_files(
+   FILES
+   FootstepLocation.msg
+   FootstepLocationsArray.msg
+)
+
+generate_messages(DEPENDENCIES geometry_msgs)
 
 catkin_package(
   INCLUDE_DIRS include

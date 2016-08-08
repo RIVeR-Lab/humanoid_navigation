@@ -23,10 +23,13 @@
 #define FOOTSTEP_PLANNER_FOOTSTEPPLANNER_H_
 
 #include <geometry_msgs/Pose.h>
+#include <geometry_msgs/PoseArray.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <humanoid_nav_msgs/PlanFootsteps.h>
 #include <humanoid_nav_msgs/PlanFootstepsBetweenFeet.h>
+#include <footstep_planner/FootstepLocation.h>
+#include <footstep_planner/FootstepLocationsArray.h>
 #include <footstep_planner/helper.h>
 #include <footstep_planner/PathCostHeuristic.h>
 #include <footstep_planner/FootstepPlannerEnvironment.h>
@@ -228,6 +231,7 @@ protected:
   void broadcastExpandedNodesVis();
   void broadcastRandomNodesVis();
   void broadcastFootstepPathVis();
+  void broadcastFootstepPath();
   void broadcastHeuristicPathVis();
   void broadcastPathVis();
 
@@ -287,6 +291,7 @@ protected:
   ros::Publisher  ivHeuristicPathVisPub;
   ros::Publisher  ivPathVisPub;
   ros::Publisher  ivStartPoseVisPub;
+  ros::Publisher  ivFootstepsPub;
   ros::ServiceServer ivFootstepPlanService;
   ros::ServiceServer ivFootstepPlanFeetService;
 

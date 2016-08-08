@@ -52,6 +52,9 @@ FootstepPlanner::FootstepPlanner()
   ivStartPoseVisPub = nh_private.advertise<
       geometry_msgs::PoseStamped>("start", 1);
 
+  ivFootstepsPub = nh_private.advertise<
+      footstep_planner::FootstepLocationsArray>("footsteps_locations", 1);
+
   std::string heuristic_type;
   double diff_angle_cost;
 
@@ -386,6 +389,10 @@ FootstepPlanner::run()
       broadcastRandomNodesVis();
       broadcastFootstepPathVis();
       broadcastPathVis();
+
+      if (path_is_new) {
+        broadcastFootstepPath();
+      }
 
       return true;
     }
@@ -1171,4 +1178,59 @@ FootstepPlanner::footPoseToMarker(const State& foot_pose,
 
   marker->lifetime = ros::Duration();
 }
+
+
+void
+FootstepPlanner::broadcastFootstepPath()
+{
+  if (getPathSize() == 0)
+  {
+    ROS_INFO("no path has been extracted yet");
+    return;
+  }
+
+  footstep_planner::FootstepLocation step;
+  footstep_planner::FootstepLocationsArray broadcast_msg;
+  std::vector<footstep_planner::FootstepLocation> steps;
+
+  // add the footsteps of the path to the publish vector
+  for(state_iter_t path_iter = getPathBegin() + 1; path_iter != getPathEnd();
+      ++path_iter)
+  {
+
+    const State& foot_pose = *path_iter;
+
+    float cos_theta = cos(foot_pose.getTheta());
+    float sin_theta = sin(foot_pose.getTheta());
+    float x_shift = cos_theta * ivEnvironmentParams.foot_origin_shift_x -
+                  sin_theta * ivEnvironmentParams.foot_origin_shift_y;
+    float y_shift;
+
+    if (foot_pose.getLeg() == LEFT)
+    {
+      y_shift = sin_theta * ivEnvironmentParams.foot_origin_shift_x +
+              cos_theta * ivEnvironmentParams.foot_origin_shift_y;
+      step.robot_side = step.LEFT;
+    }
+    else { // leg == RLEG
+      y_shift = sin_theta * ivEnvironmentParams.foot_origin_shift_x -
+              cos_theta * ivEnvironmentParams.foot_origin_shift_y;
+      step.robot_side = step.RIGHT;
+    }
+    step.pose.position.x = foot_pose.getX() + x_shift;
+    step.pose.position.y = foot_pose.getY() + y_shift;
+    step.pose.position.z = ivEnvironmentParams.footsize_z / 2.0;
+    tf::quaternionTFToMsg(tf::createQuaternionFromYaw(foot_pose.getTheta()),
+                        step.pose.orientation);
+
+
+    steps.push_back(step);
+  }
+
+  broadcast_msg.footsteps = steps;
+  ivLastMarkerMsgSize = steps.size();
+
+  ivFootstepsPub.publish(broadcast_msg);
+}
+
 }

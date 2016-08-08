@@ -25,6 +25,7 @@
   <build_depend>gridmap_2d</build_depend>
   <build_depend>humanoid_nav_msgs</build_depend>
   <build_depend>map_server</build_depend>
+  <build_depend>message_generation</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>rospy</build_depend>
   <build_depend>sbpl</build_depend>
@@ -36,6 +37,7 @@
   <run_depend>gridmap_2d</run_depend>
   <run_depend>humanoid_nav_msgs</run_depend>
   <run_depend>map_server</run_depend>
+  <run_depend>message_runtime</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>rospy</run_depend>
   <run_depend>sbpl</run_depend>
